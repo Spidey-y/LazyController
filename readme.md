@@ -4,6 +4,11 @@ I hate when i share my pc screen to tv to watch a movie while laying on my bed a
 
 The app is built using flask and flutter, don't worry no need to build or anything, just run the server and open the link on your phone's browser or pc browser or whatever.
 
+# Head's up
+
+1. both your phone and pc must be connected to the same network.
+2. the web app will take arround 5 seconds or so depending on your network to load, only the first time you open it.
+
 # How to use
 
 1. Clone the repo
@@ -14,7 +19,7 @@ pip install -r requirements.txt
 python start.py
 ```
 
-3. i also recoommend using a virtual environment just to keep things clean
+PS: I recoommend using a virtual environment just to keep things clean
 
 # TODO
 
