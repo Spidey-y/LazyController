@@ -24,6 +24,6 @@ PS: I recoommend using a virtual environment just to keep things clean
 
 # TODO
 
-1. add keyboard, shortcuts/macros (copy/paste, undo/redo, open app, etc)
+1. add keyboard, shortcuts/macros (discord/apps shortcuts, open app, etc)
 2. add mouse (tochpad)
 3. improve the design and make it customizable
