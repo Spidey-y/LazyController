@@ -1,0 +1,3 @@
+flask
+keyboard
+flask_cors 
