@@ -6,8 +6,9 @@ The app is built using flask and flutter, don't worry no need to build or anythi
 
 # Head's up
 
-1. both your phone and pc must be connected to the same network.
-2. the web app will take arround 5 seconds or so depending on your network to load, only the first time you open it.
+1. Both your phone and pc must be connected to the same network.
+2. The web app will take arround 5 seconds or so depending on your network to load, only the first time you open it.
+3. Dont judge the design, it obviously wasn't my priority 😂
 
 # How to use
 
