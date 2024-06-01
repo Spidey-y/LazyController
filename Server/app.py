@@ -1,67 +1,84 @@
-import logging
-import sys
-from flask import Flask, jsonify
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.responses import JSONResponse
 import keyboard
-from flask_cors import CORS
-
-app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
-
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
-
-logging.disable(logging.CRITICAL)
+import pyautogui
 
 
-@app.route('/play_pause')
+app = FastAPI()
+pyautogui.FAILSAFE = False
+
+
+@app.get('/play_pause')
 def play_pause():
     keyboard.press_and_release('play/pause media')
     message = 'Play/Pause button pressed'
     print(message)
-    return jsonify({'message': 'play/pause'})
+    return JSONResponse(content={'message': 'play/pause'})
 
 
-@app.route('/next_track')
+@app.get('/next_track')
 def next_track():
     keyboard.press_and_release('next track')
     message = 'Next track button pressed'
     print(message)
-    return jsonify({'message': 'next track'})
+    return JSONResponse(content={'message': 'next track'})
 
 
-@app.route('/previous_track')
+@app.get('/previous_track')
 def previous_track():
     keyboard.press_and_release('previous track')
     message = 'Previous track button pressed'
     print(message)
-    return jsonify({'message': 'previous track'})
+    return JSONResponse(content={'message': 'previous track'})
 
 
-@app.route('/volume_up')
+@app.get('/volume_up')
 def volume_up():
     keyboard.press_and_release('volume up')
     message = 'Volume up button pressed'
     print(message)
-    return jsonify({'message': 'volume up'})
+    return JSONResponse(content={'message': 'volume up'})
 
 
-@app.route('/volume_down')
+@app.get('/volume_down')
 def volume_down():
     keyboard.press_and_release('volume down')
     message = 'Volume down button pressed'
     print(message)
-    return jsonify({'message': 'volume down'})
+    return JSONResponse(content={'message': 'volume down'})
 
 
-@app.route('/mute')
+@app.get('/mute')
 def mute():
     keyboard.press_and_release('volume mute')
     message = 'Mute button pressed'
     print(message)
-    return jsonify({'message': 'mute'})
+    return JSONResponse(content={'message': 'mute'})
 
 
-cli = sys.modules['flask.cli']
-cli.show_server_banner = lambda *x: None
-if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=sys.argv[1])
+async def move_cursor(websocket: WebSocket):
+    try:
+        width, height = pyautogui.size()
+        scale = .5
+        await websocket.accept()
+        while True:
+            data = await websocket.receive_json()
+            if "x" in data and "y" in data:
+                x = data["x"] * width * scale
+                y = data["y"] * height * scale
+                pyautogui.moveTo(x, y)
+            if "click" in data and data["click"] == "true":
+                pyautogui.click()
+            if "right_click" in data and data["right_click"] == "true":
+                pyautogui.rightClick()
+    except WebSocketDisconnect:
+        pass
+
+
+@app.websocket('/move')
+async def move_handler(websocket: WebSocket):
+    await move_cursor(websocket)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=5000)

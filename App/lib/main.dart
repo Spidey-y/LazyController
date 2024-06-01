@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 import 'package:http/http.dart' as http;
+import 'package:remote/appbar.dart';
+import 'package:remote/touchpad.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,6 +16,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'LazyController',
+      routes: {
+        '/touchpad': (context) => const TouchPad(),
+      },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
@@ -82,15 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ];
 
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('LazyController',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold)),
-          centerTitle: true,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-        ),
+        appBar: buildAppBar(context),
         body: GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: isHorizontal
@@ -99,14 +96,18 @@ class _MyHomePageState extends State<MyHomePage> {
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
           ),
-          itemCount: buttons.length,
+          itemCount: buttons.length + 1,
           itemBuilder: (BuildContext context, int index) {
-            return gridButton(
-                buttons[index]["title"],
-                buttons[index]["icon"],
-                buttons[index]["iconColor"],
-                buttons[index]["color"],
-                buttons[index]["url"]);
+            return index < buttons.length
+                ? gridButton(buttons[index]["title"], buttons[index]["icon"],
+                    buttons[index]["iconColor"], buttons[index]["color"], () {
+                    apiCall(buttons[index]["url"]);
+                  })
+                : gridButton(
+                    "Touchpad", Icons.mouse_outlined, Colors.white, Colors.blue,
+                    () {
+                    Navigator.pushNamed(context, '/touchpad');
+                  });
           },
         ));
   }
@@ -115,6 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int port = html.window.location.port == ""
       ? 80
       : int.parse(html.window.location.port) - 1;
+
   void apiCall(String endpoint) async {
     var url = Uri.http("$hostname:$port", endpoint);
     var response = await http.get(url);
@@ -123,10 +125,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   gridButton(
-      String title, IconData icon, Color iconColor, Color color, String url) {
+      String title, IconData icon, Color iconColor, Color color, action) {
     return InkWell(
       onTap: () {
-        apiCall(url);
+        action();
       },
       child: Container(
         padding: const EdgeInsets.all(5),
